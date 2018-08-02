@@ -9,10 +9,9 @@ int whichPattern(const Mat& image);
 
 int main()
 {
-	for(int i = 1; i <= 100; i++){
-		String file = "./data/t" + to_string(i) + ".png";
+	for(int i = 1; i <= 1000; i++){
+		String file = "../passData/dataset/" + to_string(i) + ".jpeg";
 		Mat srcImage = imread(file, 0);
-		imshow("Source Image", srcImage);
 		
 		int pattern = whichPattern(srcImage); // determine pattern of the image 
 
@@ -25,7 +24,6 @@ int main()
 			thresh = 210;
 
 		threshold(srcImage, threshImg, thresh, 255, THRESH_BINARY_INV);
-		imshow("Thresh Image", threshImg);
 		
 		Mat labels, stats, centroids;
 		int noComp = connectedComponentsWithStats(threshImg, labels, stats, centroids);
@@ -113,15 +111,11 @@ int main()
 		subDigit = Rect(col, 0, subMat2.cols-col, subImage.rows);
 		digits.push_back(Mat(subMat2, subDigit));
 
-		for(int i = 0; i < digits.size(); i++){
-			String name = "Digit" + to_string(i);
-			imshow(name, digits[i]);
+		for(int j = 0; j < digits.size(); j++){
+			String name = "../passData/digits/digit_" + to_string(i) + "_" + to_string(j) + ".jpeg";
+			cout << name << endl;
+			imwrite(name, digits[j]);
 		}
-
-		imshow("Sub Image", subImage);
-		//imshow("RESULT", binaryImage);
-	
-		waitKey();
 	}
 }
 
