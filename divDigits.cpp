@@ -7,21 +7,33 @@ using namespace std;
 inline Mat calcHist(const Mat& image);
 int whichPattern(const Mat& image);
 
-int main()
-{
-	for(int i = 1001; i <= 1500; i++){
-		String file = "../Desktop/dataset/" + to_string(i) + ".jpeg";
+
+// obtained through experiment
+const int pattern1_thresh = 220;
+const int pattern2_thresh = 210;
+const int min_connected_len = 15; // minimum length of connected components which will not discard
+
+int main(int argc, char *argv[])
+{	
+	if(argc != 5) {
+		cout << "Usage: breaker <path-to-data> <digit-write-path> <start-index> <end-index>" << endl;
+		exit(-1);
+	}
+
+	string path_to_data = argv[1];
+	string digit_write_path = argv[2];
+	int start_index = atoi(argv[3]);
+	int end_index = atoi(argv[4]);
+
+	for(int i = start_index; i <= end_index; i++){
+		string file = path_to_data + "/" + to_string(i) + ".jpeg";
 		Mat srcImage = imread(file, 0);
 		
 		int pattern = whichPattern(srcImage); // determine pattern of the image 
 
 		Mat threshImg;
-		int thresh;
-
-		if(pattern == 1) // first pattern
-			thresh = 220;
-		else // second pattern
-			thresh = 210;
+		
+		int thresh = pattern == 1 ? pattern1_thresh : pattern2_thresh;
 
 		threshold(srcImage, threshImg, thresh, 255, THRESH_BINARY_INV);
 		
@@ -37,7 +49,7 @@ int main()
 	
 		for(int i = 1; i < noComp; i++)
 			// if size less than <t> pixels dont include
-			includeComp[i] = (stats.at<int>(i, CC_STAT_AREA) > 16) ? (foreComps.push_back(i), true) : false;
+			includeComp[i] = (stats.at<int>(i, CC_STAT_AREA) >= min_connected_len) ? (foreComps.push_back(i), true) : false;
 		
 
 		for(int y = 0; y < labels.rows; y++)
@@ -51,8 +63,10 @@ int main()
 			}
 		
 		
-		int minCol = 30;
+		int minCol = 30; // seen that all digits start at 30th column 
+						 // no need for additional computation
 		
+
 		int maxCol = 0;
 		for(int i = 0; i < foreComps.size(); i++){
 			int col = stats.at<int>(foreComps[i], CC_STAT_LEFT) + stats.at<int>(foreComps[i], CC_STAT_WIDTH);
@@ -112,8 +126,7 @@ int main()
 		digits.push_back(Mat(subMat2, subDigit));
 
 		for(int j = 0; j < digits.size(); j++){
-			String name = "../Desktop/digits/digit_" + to_string(i) + "_" + to_string(j) + ".jpeg";
-			cout << name << endl;
+			string name =  digit_write_path	+ "/" + to_string(i) + "_" + to_string(j) + ".jpeg";
 			imwrite(name, digits[j]);
 		}
 	}
@@ -130,17 +143,6 @@ Mat calcHist(const Mat& image)
 
 	calcHist(&image, 1, channels, Mat(), imgHist, 1, &histSize, &histRange);
 
-#if 0
-	int distinctIntensityCount = 0;
-	for(int i = 0; i < histSize; i++)
-		if(imgHist.at<float>(i) != 0){
-			cout << i << ": " << imgHist.at<float>(i) << endl;
-			distinctIntensityCount++;
-		}
-
-	cout << distinctIntensityCount << endl;
-#endif
-	
 	return imgHist;
 }
 
