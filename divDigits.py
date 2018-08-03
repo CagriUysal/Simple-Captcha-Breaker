@@ -28,8 +28,8 @@ def main():
 	start_index = int(sys.argv[3]);
 	end_index = int(sys.argv[4]);
 
-	for i in range(start_index, end_index + 1):
-		file = path_to_data + "/" + str(i) + ".jpeg"
+	for idx in range(start_index, end_index + 1):
+		file = path_to_data + "/" + str(idx) + ".jpeg"
 		srcImage = cv2.imread(file, 0)
 
 		pattern = whichPattern(srcImage) # determine the pattern of the image
@@ -85,17 +85,11 @@ def main():
 		digitList.append(subImage1[:, int(col1):])
 		digitList.append(subImage2[:, int(col2):])
 
-		#digitList = np.array_split(subImage, 6, axis=1)
 		
-		cv2.imshow('img', binaryImage)
-		cv2.imshow('sub', subImage)
 		
-		for i in range(6):
-			cv2.imshow(str(i), digitList[i])
-
-		if cv2.waitKey() == ord('q'):
-			return 0
-
+		for j in range(6):
+			print(idx)
+			cv2.imwrite(digit_write_path + '/digit_' + str(idx) + '_' +  str(j) + '.jpeg', digitList[j])
 
 
 if __name__ == '__main__':
