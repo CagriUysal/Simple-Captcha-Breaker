@@ -9,8 +9,8 @@ int whichPattern(const Mat& image);
 
 int main()
 {
-	for(int i = 1; i <= 1000; i++){
-		String file = "../passData/dataset/" + to_string(i) + ".jpeg";
+	for(int i = 1001; i <= 1500; i++){
+		String file = "../Desktop/dataset/" + to_string(i) + ".jpeg";
 		Mat srcImage = imread(file, 0);
 		
 		int pattern = whichPattern(srcImage); // determine pattern of the image 
@@ -112,7 +112,7 @@ int main()
 		digits.push_back(Mat(subMat2, subDigit));
 
 		for(int j = 0; j < digits.size(); j++){
-			String name = "../passData/digits/digit_" + to_string(i) + "_" + to_string(j) + ".jpeg";
+			String name = "../Desktop/digits/digit_" + to_string(i) + "_" + to_string(j) + ".jpeg";
 			cout << name << endl;
 			imwrite(name, digits[j]);
 		}

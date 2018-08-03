@@ -15,8 +15,6 @@ dset = datasets.ImageFolder(root='train', transform=transform)
 dloader = torch.utils.data.DataLoader(dset,
 	batch_size=8, shuffle=True, num_workers=12)
 
-#net = nn.DataParallel(Net()) if torch.cuda.device_count() > 1 else Net()
-
 net = torch.load('model.pt').to(device)
 with torch.no_grad():
 	for i, (inp,lab) in enumerate(dloader,0):
