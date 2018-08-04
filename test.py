@@ -1,17 +1,15 @@
 import cv2
-import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
 from torchvision import transforms, datasets
 from model import Net
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-transform = transforms.Compose([transforms.Scale((24,14)), transforms.Grayscale(num_output_channels=1),
+transform = transforms.Compose([transforms.Scale((24,14)),
+	transforms.Grayscale(num_output_channels=1),
 	transforms.ToTensor()])
-dset = datasets.ImageFolder(root='train', transform=transform)
+
+dset = datasets.ImageFolder(root='test', transform=transform)
 dloader = torch.utils.data.DataLoader(dset,
 	batch_size=8, shuffle=True, num_workers=12)
 
