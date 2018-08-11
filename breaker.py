@@ -15,8 +15,7 @@ def break_captcha(image):
 
 	out = [num.item() for num in nums]
 
-	captcha = [out[0], out[2], out[4], out[1], out[3], out[5]]
-	captcha = ''.join([str(i) for i in captcha])
+	captcha = ''.join([str(i) for i in out])
 	return captcha
 
 if __name__ == '__main__':

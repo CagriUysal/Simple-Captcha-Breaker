@@ -62,20 +62,21 @@ def separate_image(file):
 	colIncrement1 = subImage1.shape[1] / 3
 	colIncrement2 = subImage2.shape[1] / 3
 	
-	digitList = []
+	digitList1 = []
+	digitList2 = []
 	
 	col1 = 0
 	col2 = 0
 	for i in range(2):
-		digitList.append(subImage1[:, int(col1):int(col1+colIncrement1)])
-		digitList.append(subImage2[:, int(col2):int(col2+colIncrement2)])
+		digitList1.append(subImage1[:, int(col1):int(col1+colIncrement1)])
+		digitList2.append(subImage2[:, int(col2):int(col2+colIncrement2)])
 		col1 += colIncrement1
 		col2 += colIncrement2
 
-	digitList.append(subImage1[:, int(col1):])
-	digitList.append(subImage2[:, int(col2):])
+	digitList1.append(subImage1[:, int(col1):])
+	digitList2.append(subImage2[:, int(col2):])
 
-	return digitList
+	return digitList1 + digitList2
   
 def divDigits(args):
 	if(len(args) != 5):
