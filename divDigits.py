@@ -91,8 +91,8 @@ def divDigits(args):
 	for idx in range(start_index, end_index + 1):
 		file = path_to_data + "/" + str(idx) + ".jpeg"
 		digit_list = separate_image(file)
+		print(idx, end='\r', flush=True)
 		for j in range(6):
-			print(idx)
 			cv2.imwrite(digit_write_path + '/digit_' + str(idx) + '_' +  str(j) + '.jpeg', digit_list[j])
 
 if __name__ == '__main__':

@@ -2,4 +2,3 @@ __pycache__
 model.pt
 train
 test
-breaker
