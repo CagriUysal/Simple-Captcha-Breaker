@@ -3,8 +3,8 @@ import sys
 import numpy as np
 
 #obtained through experiment 
-pattern1_thresh = 220
-pattern2_thresh = 210
+pattern1_thresh = 145
+pattern2_thresh = 145
 min_connected_len = 20
 
 def whichPattern(image):
@@ -26,7 +26,24 @@ def separate_image(file):
 
 	thresh = pattern1_thresh if pattern == 1 else pattern2_thresh
 
+	# test if gaussian works
+	srcImage = cv2.medianBlur(srcImage, 3) if pattern == 1 else cv2.GaussianBlur(srcImage, (3,3), 0)
+	if pattern == 1:
+		srcImage = cv2.GaussianBlur(srcImage, (5,5), 1)
+
+	cv2.imshow("blurred", srcImage)
+	
+	#global threshImage
+	#while cv2.waitKey() != ord('c') and pattern1_thresh != 255:
 	ret, threshImage = cv2.threshold(srcImage, thresh, 255, cv2.THRESH_BINARY_INV)
+	cv2.imshow("threshold", threshImage)
+	#print(thresh, end='\r', flush=True)
+	#thresh += 1
+	if pattern == 1:	
+		kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))
+		#threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_ERODE, kernel)
+		threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_CLOSE, kernel)
+		cv2.imshow("morp", threshImage)
 	
 	numLabel, labelImage, stats, centroids = cv2.connectedComponentsWithStats(threshImage, 8, cv2.CV_32S)
 	
@@ -35,7 +52,7 @@ def separate_image(file):
 	
 	
 	minCol = 30; # seen that all digits start at 30th column 
-				 # no need for additional computation
+							 # no need for additional computation
 	
 	binaryImage = np.zeros_like(srcImage)
 	labelImage = np.array(labelImage)
@@ -48,7 +65,7 @@ def separate_image(file):
 		
 	if pattern == 2:
 		if maxCol <= 111:
-			maxCol = 111
+			axCol = 111
 		elif maxCol < 117:
 			maxCol = 117
 
@@ -75,6 +92,9 @@ def separate_image(file):
 
 	digitList1.append(subImage1[:, int(col1):])
 	digitList2.append(subImage2[:, int(col2):])
+	
+	if cv2.waitKey() == ord('q'):
+		sys.exit(1)
 
 	return digitList1 + digitList2
   
