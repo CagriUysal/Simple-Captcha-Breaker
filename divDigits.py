@@ -3,9 +3,9 @@ import sys
 import numpy as np
 
 #obtained through experiment 
-pattern1_thresh = 145
+pattern1_thresh = 170
 pattern2_thresh = 145
-min_connected_len = 20
+min_connected_len = 15
 
 def whichPattern(image):
 	hist = cv2.calcHist([image], [0], None, [256], [0, 256])
@@ -28,23 +28,31 @@ def separate_image(file):
 
 	# test if gaussian works
 	srcImage = cv2.medianBlur(srcImage, 3) if pattern == 1 else cv2.GaussianBlur(srcImage, (3,3), 0)
-	if pattern == 1:
-		srcImage = cv2.GaussianBlur(srcImage, (5,5), 1)
+	
+	#if pattern == 1:
+	#	srcImage2 = cv2.GaussianBlur(srcImage, (3,3), 0)
 
-	cv2.imshow("blurred", srcImage)
+	#cv2.imshow("Median", srcImage)
 	
 	#global threshImage
 	#while cv2.waitKey() != ord('c') and pattern1_thresh != 255:
 	ret, threshImage = cv2.threshold(srcImage, thresh, 255, cv2.THRESH_BINARY_INV)
-	cv2.imshow("threshold", threshImage)
+	#cv2.imshow("threshold", threshImage)
 	#print(thresh, end='\r', flush=True)
 	#thresh += 1
+	'''
 	if pattern == 1:	
-		kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))
-		#threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_ERODE, kernel)
-		threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_CLOSE, kernel)
-		cv2.imshow("morp", threshImage)
-	
+		kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
+		#threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_DILATE, kernel, 1)
+		#cv2.imshow("after dilate", threshImage)
+		threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_CLOSE, kernel, 2)
+		cv2.imshow("after close", threshImage)
+		#kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
+		#threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_CLOSE, kernel, 1)
+		#cv2.imshow("after close", threshImage)
+		#threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_ERODE, kernel, 1)
+		#cv2.imshow("after erode", threshImage)
+	'''	
 	numLabel, labelImage, stats, centroids = cv2.connectedComponentsWithStats(threshImage, 8, cv2.CV_32S)
 	
 	# holds if compenet will be included to foreground
@@ -63,6 +71,7 @@ def separate_image(file):
 	array = np.array([stats[i, cv2.CC_STAT_LEFT] + stats[i, cv2.CC_STAT_WIDTH]  for i in foreComps])
 	maxCol = max(array[np.where(array < 125)])
 		
+	# Dont touch
 	if pattern == 2:
 		if maxCol <= 111:
 			axCol = 111
@@ -72,7 +81,12 @@ def separate_image(file):
 	minRow = min([stats[i, cv2.CC_STAT_TOP] for i in foreComps])
 	maxRow = max([stats[i, cv2.CC_STAT_TOP] + stats[i, cv2.CC_STAT_HEIGHT] for i in foreComps])
 
-	subImage = binaryImage[minRow:maxRow, minCol:maxCol]
+	#subImage = binaryImage[minRow:maxRow, minCol:maxCol]
+	#cv2.imshow("subImage", subImage)
+	
+	subImage = threshImage[minRow:maxRow, minCol:maxCol]
+	#cv2.imshow("subImage", subImage1)
+
 	subImage1 = subImage[:, :int(subImage.shape[1]/2)]
 	subImage2 = subImage[:, int(subImage.shape[1]/2):]
 
