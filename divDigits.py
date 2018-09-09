@@ -4,7 +4,7 @@ import numpy as np
 
 #obtained through experiment 
 pattern1_thresh = 170
-pattern2_thresh = 145
+pattern2_thresh = 155
 min_connected_len = 15
 
 def whichPattern(image):
@@ -72,11 +72,11 @@ def separate_image(file):
 	maxCol = max(array[np.where(array < 125)])
 		
 	# Dont touch
-	if pattern == 2:
-		if maxCol <= 111:
-			axCol = 111
-		elif maxCol < 117:
-			maxCol = 117
+	#if pattern == 2:
+		#if maxCol <= 111:
+		#	axCol = 111
+		#elif maxCol < 117:
+		#	maxCol = 117
 
 	minRow = min([stats[i, cv2.CC_STAT_TOP] for i in foreComps])
 	maxRow = max([stats[i, cv2.CC_STAT_TOP] + stats[i, cv2.CC_STAT_HEIGHT] for i in foreComps])
@@ -106,11 +106,56 @@ def separate_image(file):
 
 	digitList1.append(subImage1[:, int(col1):])
 	digitList2.append(subImage2[:, int(col2):])
-	
-	if cv2.waitKey() == ord('q'):
-		sys.exit(1)
 
-	return digitList1 + digitList2
+	# Handle Shifting
+	digitList = digitList1 + digitList2
+
+	for i in range(1, 6):
+		#cv2.imshow("Digit", digitList[i])
+		# Appy slight closing before finding c.c, sometimes particular digit parts only apart by 1 pixels (fill them to avoid false shifting)
+		kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))
+		closedDigit= cv2.morphologyEx(digitList[i], cv2.MORPH_CLOSE, kernel, 1)
+
+		numLabel, labelImage, stats, centroids = cv2.connectedComponentsWithStats(closedDigit, 8, cv2.CV_32S)
+		#print(numLabel)
+		if numLabel > 2: # consider shifting if there is more than 1(with background its 2)  c.c. per digit
+			#largest_label = 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA]) # largest c.c. in digit
+			#print(largest_label)
+			#cv2.waitKey()
+			for j in range(1,numLabel):
+				# If it touches left border of the image
+				# and it's width doesnt exceed 35 percent of the digit, assume it is a shifting
+				if stats[j, cv2.CC_STAT_LEFT] == 0 and stats[j, cv2.CC_STAT_LEFT] + stats[j, cv2.CC_STAT_WIDTH] < 0.35 * digitList[i].shape[1]:
+					# find the part that will attach to previous digit
+					startCol = stats[j, cv2.CC_STAT_LEFT]
+					width_shifted = stats[j, cv2.CC_STAT_WIDTH]
+					shiftedPart = digitList[i][:, startCol:startCol+width_shifted]	
+					#cv2.imshow("before shift", digitList[i - 1])
+					
+					# shift previous image to left while maintain its size 
+					# shift amount is width of the shifted-part
+					fixedDigit = np.zeros_like(digitList[i - 1])
+					fixedDigit[:, 0:fixedDigit.shape[1] - width_shifted] = digitList[i - 1][:, width_shifted:fixedDigit.shape[1]]
+          
+					# appending shifted part back to previous digit
+					fixedDigit[:, fixedDigit.shape[1]-width_shifted:fixedDigit.shape[1]] = shiftedPart[:]
+					
+					#cv2.imshow("after shifting", fixedDigit)
+					#cv2.imshow("shifted", shiftedPart)
+					#cv2.waitKey()
+					
+					digitList[i - 1] = fixedDigit # replace digit with fixed digit
+					
+					# remove shifted part from current digit 
+					#shiftRemoved = np.zeros_like(digitList[i])
+					#shiftRemoved[:, 0:shiftRemoved.shape[1] - width_shifted] = digitList[i][:, width_shifted:shiftRemoved.shape[1]]
+					digitList[i][:, 0:width_shifted] = 0
+					 
+
+	#if cv2.waitKey() == ord('q'):
+	#	sys.exit(1)
+
+	return digitList
   
 def divDigits(args):
 	if(len(args) != 5):
