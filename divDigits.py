@@ -26,33 +26,12 @@ def separate_image(file):
 
 	thresh = pattern1_thresh if pattern == 1 else pattern2_thresh
 
-	# test if gaussian works
+	# use median blue for pattern1 and gaussian blur for patter2 images as pre-processing
 	srcImage = cv2.medianBlur(srcImage, 3) if pattern == 1 else cv2.GaussianBlur(srcImage, (3,3), 0)
 	
-	#if pattern == 1:
-	#	srcImage2 = cv2.GaussianBlur(srcImage, (3,3), 0)
-
-	#cv2.imshow("Median", srcImage)
-	
-	#global threshImage
-	#while cv2.waitKey() != ord('c') and pattern1_thresh != 255:
 	ret, threshImage = cv2.threshold(srcImage, thresh, 255, cv2.THRESH_BINARY_INV)
-	#cv2.imshow("threshold", threshImage)
-	#print(thresh, end='\r', flush=True)
-	#thresh += 1
-	'''
-	if pattern == 1:	
-		kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
-		#threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_DILATE, kernel, 1)
-		#cv2.imshow("after dilate", threshImage)
-		threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_CLOSE, kernel, 2)
-		cv2.imshow("after close", threshImage)
-		#kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2,2))
-		#threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_CLOSE, kernel, 1)
-		#cv2.imshow("after close", threshImage)
-		#threshImage = cv2.morphologyEx(threshImage, cv2.MORPH_ERODE, kernel, 1)
-		#cv2.imshow("after erode", threshImage)
-	'''	
+
+	# get connected components
 	numLabel, labelImage, stats, centroids = cv2.connectedComponentsWithStats(threshImage, 8, cv2.CV_32S)
 	
 	# holds if compenet will be included to foreground
@@ -62,37 +41,33 @@ def separate_image(file):
 	minCol = 30; # seen that all digits start at 30th column 
 							 # no need for additional computation
 	
+	
+	# Get binary image after erasing some connected components those areas under the threshold
 	binaryImage = np.zeros_like(srcImage)
 	labelImage = np.array(labelImage)
 	for k in [np.where(labelImage == i) for i in foreComps]:
 		binaryImage[k] = 255
-	
 
+	# find the boundaries where digits present in the image 
 	array = np.array([stats[i, cv2.CC_STAT_LEFT] + stats[i, cv2.CC_STAT_WIDTH]  for i in foreComps])
-	maxCol = max(array[np.where(array < 125)])
-		
-	# Dont touch
-	#if pattern == 2:
-		#if maxCol <= 111:
-		#	axCol = 111
-		#elif maxCol < 117:
-		#	maxCol = 117
-
+	maxCol = max(array[np.where(array < 125)]) # observed that digits right boundary never exceeds 125th pixel 
+																						 # thus this one prevents false boundaries
+	
+	# find boundaries in y axis
 	minRow = min([stats[i, cv2.CC_STAT_TOP] for i in foreComps])
 	maxRow = max([stats[i, cv2.CC_STAT_TOP] + stats[i, cv2.CC_STAT_HEIGHT] for i in foreComps])
 
-	#subImage = binaryImage[minRow:maxRow, minCol:maxCol]
-	#cv2.imshow("subImage", subImage)
 	
 	subImage = threshImage[minRow:maxRow, minCol:maxCol]
-	#cv2.imshow("subImage", subImage1)
-
+	
+	# Sub image divided to half in order to segment digit's more precisely
 	subImage1 = subImage[:, :int(subImage.shape[1]/2)]
 	subImage2 = subImage[:, int(subImage.shape[1]/2):]
 
 	colIncrement1 = subImage1.shape[1] / 3
 	colIncrement2 = subImage2.shape[1] / 3
 	
+	# get segmented digits as list
 	digitList1 = []
 	digitList2 = []
 	
@@ -106,12 +81,12 @@ def separate_image(file):
 
 	digitList1.append(subImage1[:, int(col1):])
 	digitList2.append(subImage2[:, int(col2):])
-
-	# Handle Shifting
 	digitList = digitList1 + digitList2
-
+	
+	# It is observed that sometimes part of the previous digit shifted to 
+	# digit that follows it.
+	# Following prevents it most of the time
 	for i in range(1, 6):
-		#cv2.imshow("Digit", digitList[i])
 		# Appy slight closing before finding c.c, sometimes particular digit parts only apart by 1 pixels (fill them to avoid false shifting)
 		kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3,3))
 		closedDigit= cv2.morphologyEx(digitList[i], cv2.MORPH_CLOSE, kernel, 1)
@@ -119,9 +94,6 @@ def separate_image(file):
 		numLabel, labelImage, stats, centroids = cv2.connectedComponentsWithStats(closedDigit, 8, cv2.CV_32S)
 		#print(numLabel)
 		if numLabel > 2: # consider shifting if there is more than 1(with background its 2)  c.c. per digit
-			#largest_label = 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA]) # largest c.c. in digit
-			#print(largest_label)
-			#cv2.waitKey()
 			for j in range(1,numLabel):
 				# If it touches left border of the image
 				# and it's width doesnt exceed 35 percent of the digit, assume it is a shifting
@@ -130,8 +102,7 @@ def separate_image(file):
 					startCol = stats[j, cv2.CC_STAT_LEFT]
 					width_shifted = stats[j, cv2.CC_STAT_WIDTH]
 					shiftedPart = digitList[i][:, startCol:startCol+width_shifted]	
-					#cv2.imshow("before shift", digitList[i - 1])
-					
+
 					# shift previous image to left while maintain its size 
 					# shift amount is width of the shifted-part
 					fixedDigit = np.zeros_like(digitList[i - 1])
@@ -139,21 +110,12 @@ def separate_image(file):
           
 					# appending shifted part back to previous digit
 					fixedDigit[:, fixedDigit.shape[1]-width_shifted:fixedDigit.shape[1]] = shiftedPart[:]
-					
-					#cv2.imshow("after shifting", fixedDigit)
-					#cv2.imshow("shifted", shiftedPart)
-					#cv2.waitKey()
-					
+						
 					digitList[i - 1] = fixedDigit # replace digit with fixed digit
 					
 					# remove shifted part from current digit 
-					#shiftRemoved = np.zeros_like(digitList[i])
-					#shiftRemoved[:, 0:shiftRemoved.shape[1] - width_shifted] = digitList[i][:, width_shifted:shiftRemoved.shape[1]]
 					digitList[i][:, 0:width_shifted] = 0
 					 
-
-	#if cv2.waitKey() == ord('q'):
-	#	sys.exit(1)
 
 	return digitList
   
