@@ -10,9 +10,9 @@ def save_digits(readPath, writePath, start, end, gT):
   with open(gT, 'rU') as f:
     numbers = [[j for j in list(i)] for i in f.read().splitlines()]
   
-	# create write path if necessary
-	if not os.path.exists(writePath):
-		os.mkdir(writePath)
+  # create write path if necessary
+  if not os.path.exists(writePath):
+    os.mkdir(writePath)
 
   # check if dirs for individual digits exits
   # if not create {0,1 .. 9}
@@ -31,9 +31,9 @@ def save_digits(readPath, writePath, start, end, gT):
     number_ind += 1
 
 if __name__ == '__main__':
-	if len(sys.argv) != 6:
-		print('Usage: ./saveDigits.py <readPath> <writePath> <startIndex> <endIndex> <groundTruths>')
-		sys.exit(-1)
+  if len(sys.argv) != 6:
+    print('Usage: ./saveDigits.py <readPath> <writePath> <startIndex> <endIndex> <groundTruths>')
+    sys.exit(-1)
 
-	save_digits(sys.argv[1],sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), sys.argv[5])
+  save_digits(sys.argv[1],sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), sys.argv[5])
   
