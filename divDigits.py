@@ -121,7 +121,7 @@ def separate_image(file):
   
 def divDigits(args):
 	if(len(args) != 5):
-		print("Usage: breaker <path-to-data> <digit-write-path> <start-index> <end-index>")
+		print("Usage: python divDigits.py <path-to-data> <digit-write-path> <start-index> <end-index>")
 		sys.exit(-1)
 
 	path_to_data = args[1];
