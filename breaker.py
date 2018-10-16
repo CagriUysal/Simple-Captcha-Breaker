@@ -2,7 +2,7 @@
 import sys
 import cv2
 import torch
-from divDigits import separate_image
+from utils.divDigits import separate_image
 
 model = torch.load('model.pt', map_location='cpu')
 
