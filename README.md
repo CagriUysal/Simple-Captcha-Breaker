@@ -1,7 +1,7 @@
 # Simple-Captcha-Breaker
-Simple captcha breaker is a fun project for solving obsolete captchas used in METU's course registration website.
+Simple captcha breaker is a fun project for solving (now obsolete) captchas used in METU's course registration website.
 Images used in training and testing obtained via a web bot. There was two different captcha images, we called them type1 and type2.
-We have achieved %99.1 accuracy with 4500 training images and 500 test images. 
+We have achieved 99.1% accuracy with 4500 training images and 500 test images. 
 
 <p float="left">
 <img src="https://image.ibb.co/igkbJ0/resimler1.png" alt="drawing" width="400"/>
@@ -31,10 +31,10 @@ e.g. ```python saveDigits.py /home/user/dataset /home/user/train 1 4500 /home/us
 4500 * 6 digits as jpeg files to appropriate folders. Different intervals can be used for train data.
 
 2. ``` python train.py ```
-By default train.py looks for a folder named train consisting of subfolders 0..9. This is the folder we created in step 1.
+By default `train.py` looks for a folder named `train` consisting of subfolders `0..9`. This is the folder we created in step 1.
 You can edit folder path if you want.
 
-There is pre-trained [model](https://mega.nz/#!mWYl1IpT!o-sqt5oHZWxZu7jfz9lJg9FbCJWOnsU-E_jqXSOlnfY) as in the example, remember to change file name to ```model.pt```. 
+There is a pre-trained [model](https://mega.nz/#!mWYl1IpT!o-sqt5oHZWxZu7jfz9lJg9FbCJWOnsU-E_jqXSOlnfY) as an example, remember to change file name to ```model.pt```. 
 
 ## Testing
 Steps are the similar as training. Apply the unused image interval as test interval.
@@ -46,7 +46,7 @@ python saveDigits.py <dataset-path> <test-digits-path> <startIndex> <endIndex> <
 e.g. ```python saveDigits.py /home/user/dataset /home/user/test 4501 5000 /home/user/veritas.txt```  
 Thus we used  [1, 4500] in training phase, remaining [4501, 5000] interval used as test images.
 
-2. ```python test.py``` Again by default test.py looks for a folder named test consisting of subfolders 0..9.  
+2. ```python test.py``` Again by default `test.py` looks for a folder named `test` consisting of subfolders `0..9`.  
 
 ## Individual Running
 Trained model can be run on whole image rather than separated digits via breaker.py.
