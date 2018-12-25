@@ -20,15 +20,11 @@ def save_digits(readPath, writePath, start, end, gT):
     if not os.path.exists(writePath + '/' + str(i)):
       os.mkdir(writePath + '/' + str(i))
   
-  number_ind = 0
-  for i in range(start, end+1):
+  for number_ind, i in enumerate(range(start, end+1), start -1):
     image = readPath + '/' + str(i) + '.jpeg'
     digits = separate_image(image)
-    digit_ind = 0
-    for img in digits:
+    for digit_ind, img in enumerate(digits):
       cv2.imwrite(writePath + '/' + numbers[number_ind][digit_ind] + '/' + str(i) + '_' + str(digit_ind) + '.jpeg', img)
-      digit_ind += 1
-    number_ind += 1
 
 if __name__ == '__main__':
   if len(sys.argv) != 6:
