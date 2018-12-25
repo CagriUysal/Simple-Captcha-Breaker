@@ -19,7 +19,7 @@ numpy
 Download dataset and ground truths provided.
 
 * Captcha Dataset: [dataset](https://mega.nz/#!2Xo0lYxI!utIihUv511jwJXCti4g35yjhl9ogQxjc2sTkZ2BW-Aw) 
-* Captcha Ground Truths: [GT](https://mega.nz/#!aGR1DCAR!RPVQPiiOAnV7IsSr8GMRUr6SOf2fr1tecOEuCy_Mz1c)
+* Captcha Ground Truths: [GT](https://mega.nz/#!WOJ2SYiZ!kdbwDzo7MguFsuumRsYzQ58PI8yDsoAexkwQyJJdKdQ)
 
 1. First unzip dataset and ground truths to a folder. (Dataset contains 5299 images and first 5000 image have ground truths.)
 Then use saveDigits.py which separates digits in the images and puts them to distinct folders, i.e. 0,1,..,9 so that pytorch 
