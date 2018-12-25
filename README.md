@@ -27,7 +27,7 @@ dataloader could infer the image classes.
 ```
 python saveDigits.py <dataset-path> <train-digits-path> <startIndex> <endIndex> <groundTruth-path>
 ```
-e.g. ```python saveDigits.py /home/user/dataset /home/user/train 1 4500 /home/user/veritas.txt``` will use first 4500 images as train data and puts
+e.g. ```python saveDigits.py /home/user/dataset /home/user/train 1 4500 /home/user/labels.txt``` will use first 4500 images as train data and puts
 4500 * 6 digits as jpeg files to appropriate folders. Different intervals can be used for train data.
 
 2. ``` python train.py ```
@@ -43,7 +43,7 @@ Steps are the similar as training. Apply the unused image interval as test inter
 ```
 python saveDigits.py <dataset-path> <test-digits-path> <startIndex> <endIndex> <groundTruth-path>
 ```
-e.g. ```python saveDigits.py /home/user/dataset /home/user/test 4501 5000 /home/user/veritas.txt```  
+e.g. ```python saveDigits.py /home/user/dataset /home/user/test 4501 5000 /home/user/labels.txt```  
 Thus we used  [1, 4500] in training phase, remaining [4501, 5000] interval used as test images.
 
 2. ```python test.py``` Again by default `test.py` looks for a folder named `test` consisting of subfolders `0..9`.  
