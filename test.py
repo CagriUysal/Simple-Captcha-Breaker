@@ -1,11 +1,10 @@
-import cv2
 import torch
 from torchvision import transforms, datasets
 from model import Net
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-transform = transforms.Compose([transforms.Scale((24,14)),
+transform = transforms.Compose([transforms.Resize((24,14)),
     transforms.Grayscale(num_output_channels=1),
     transforms.ToTensor()])
 
@@ -22,7 +21,9 @@ with torch.no_grad():
         inp = inp.to(device)
         lab = lab.to(device)
 
+        # forward pass
         outs = net(inp)
+        # convert output scores to predicted class
         _, pred = torch.max(outs,1)
         correct += (pred == lab).sum().item()
         total += lab.size(0)
