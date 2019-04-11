@@ -478,7 +478,7 @@ with data it has not seen before. This model achieves `98.8` percent accuracy.
 The important thing to note here is achieved accuracy is per digit and not whole captcha. Thus single captcha has six digits inside, we can assume
 `0.988^6=0.93` of the time model will predict the whole captcha correctly.
 
-Using `breaker.py` we can break whole captchas. It's usage ass follows:
+Using `breaker.py` we can break whole captchas. It's usage as follows:
 
 `python breaker.py <image_file1> [<image_file2> ...]`
 
