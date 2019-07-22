@@ -1,12 +1,14 @@
 # Simple-Captcha-Breaker
 Simple captcha breaker is a fun project for solving (now obsolete) captchas used in METU's course registration website.
 Images used in training and testing obtained via a web bot. There was two different captcha images, we called them type1 and type2.
-We have achieved 99.1% accuracy with 4500 training images and 500 test images. 
+We have achieved 99.1% accuracy with 4500 training images and 500 test images.</br>
 
 <p float="left">
 <img src="https://image.ibb.co/igkbJ0/resimler1.png" alt="drawing" width="400"/>
 <img src="https://image.ibb.co/fiBNrL/resimler2.png" alt="drawing" width="400"/>
 </p>
+
+### [Tutorial of the project](https://cagriuysal.github.io/Simple-Captcha-Breaker/)
 
 ## Prerequisites
 ```
@@ -60,3 +62,4 @@ or   ```python breaker.py /home/user/dataset/{4510..4560}.jpeg``` gives the set 
 * [yalpul](https://github.com/yalpul)  
 * [CagriUysal](https://github.com/CagriUysal)  
 * [ArdaEs](https://github.com/ArdaEs)
+
